@@ -6,13 +6,12 @@
 use user_plugin_trait::{UserLibraryHandler, UserPlugin};
 
 fn main() {
-    let filename = if cfg!(windows) {
+    let filename = if cfg!(target_os = "windows") {
         "user.dll"
-    } else if cfg!(linux) {
+    } else if cfg!(target_os = "linux") {
         "libuser.so"
-    
-    }else if cfg!(){
-
+    } else if cfg!(target_os = "macos") {
+        "libuser.dylib"
     } else {
         panic!()
     };
@@ -25,5 +24,6 @@ fn main() {
     let token = userp.login("user".into(), "password".into());
     println!("TokenIS: {}", token);
 }
+
 
 ```
