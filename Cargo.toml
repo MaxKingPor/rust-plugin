@@ -1,0 +1,21 @@
+[workspace]
+
+members = ["plugins/*", "plugin", "main"]
+
+
+[workspace.dependencies]
+# chrono = "0.4.22"
+# axum = "0.5.16"
+# tokio = "1.21.2"
+# futures-util = "0.3.24"
+serde = "1.0.145"
+toml = "0.5.9"
+# pin-project-lite = "0.2.9"
+# log = "0.4.17"
+# log4rs = "1.1.1"
+# futures = "0.3.24"
+plugin = { path = "plugin" }
+libloading = "0.7.3"
+
+user-plugin = { path = "plugins/user-plugin" }
+user-plugin-trait = { path = "plugins/user-plugin-trait" }
