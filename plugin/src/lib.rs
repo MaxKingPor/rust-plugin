@@ -49,11 +49,11 @@ impl PluginStor {
     pub fn register_plugin<P: Plugin>(
         &mut self,
         plugin: Arc<PluginInfo<P>>,
-    ) -> Result<Arc<PluginInfo<P>>, Error<()>> {
+    ) -> Result<Option<Arc<PluginInfo<P>>>, Error<()>> {
         self.plugins
             .insert(P::plugin_key(), plugin)
-            .map_or(Err(Error::LoadPluginError(())), |old| {
-                old.downcast().map_err(Error::TypeError)
+            .map_or(Ok(None), |old| {
+                old.downcast().map_err(Error::TypeError).map(Some)
             })
     }
 
