@@ -2,15 +2,18 @@ use std::{any::Any, collections::HashMap, ffi::OsStr, ops::Deref, sync::Arc};
 
 use libloading::Library;
 
-#[allow(unused)]
 pub struct PluginInfo<P: Plugin> {
     plugin: Box<P>,
+    #[allow(unused)]
     lib: Option<Arc<Library>>,
 }
 
 impl<P: Plugin> PluginInfo<P> {
     pub fn new(plugin: Box<P>, lib: impl Into<Option<Arc<Library>>>) -> Self {
-        Self { plugin, lib: lib.into() }
+        Self {
+            plugin,
+            lib: lib.into(),
+        }
     }
 }
 
@@ -46,10 +49,12 @@ impl PluginStor {
     pub fn register_plugin<P: Plugin>(
         &mut self,
         plugin: Arc<PluginInfo<P>>,
-    ) -> Option<Arc<PluginInfo<P>>> {
+    ) -> Result<Arc<PluginInfo<P>>, Error<()>> {
         self.plugins
             .insert(P::plugin_key(), plugin)
-            .and_then(|old| old.downcast().ok())
+            .map_or(Err(Error::LoadPluginError(())), |old| {
+                old.downcast().map_err(Error::TypeError)
+            })
     }
 
     pub fn get_plugin<P: Plugin>(&self) -> Result<Arc<PluginInfo<P>>, Error<()>> {

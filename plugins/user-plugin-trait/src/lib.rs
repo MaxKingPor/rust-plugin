@@ -1,12 +1,11 @@
 // use std::ffi::*;
 
-use std::{sync::Arc, any::Any, ops::Deref};
+use std::{any::Any, ops::Deref, sync::Arc};
 
 use libloading::Library;
 use plugin::{LibraryHandler, Plugin, PluginInfo, PluginStor};
 use serde::{Deserialize, Serialize};
 
-#[allow(unused)]
 pub struct UserPlugin {
     symbol: Box<dyn UserPluginTrait>,
 }
@@ -19,10 +18,7 @@ impl Deref for UserPlugin {
     }
 }
 
-#[allow(unused)]
-pub struct UserLibraryHandler {
-    lib: Arc<Library>,
-}
+pub struct UserLibraryHandler;
 
 unsafe impl Send for UserPlugin {}
 unsafe impl Sync for UserPlugin {}
@@ -49,11 +45,11 @@ impl LibraryHandler for UserLibraryHandler {
                 .get::<fn() -> Box<dyn UserPluginTrait>>(b"get_user_plugin_trait\0")
                 .map_err(plugin::Error::LibraryError)?;
             let symbol = init_fn();
-            stor.register_plugin(Arc::new(PluginInfo::new(
+            let old = stor.register_plugin(Arc::new(PluginInfo::new(
                 Box::new(UserPlugin { symbol }),
                 lib,
-            )));
-
+            )))?;
+            drop(old);
             Ok(())
         }
     }
