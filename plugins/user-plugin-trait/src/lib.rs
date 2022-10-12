@@ -25,7 +25,12 @@ unsafe impl Sync for UserPlugin {}
 
 impl Plugin for UserPlugin {
     fn plugin_key() -> &'static str {
-        "UserPluginTrait"
+        concat!(
+            "UserPlugin-",
+            env!("CARGO_CRATE_NAME"),
+            "-",
+            env!("CARGO_PKG_VERSION")
+        )
     }
 
     fn call(
